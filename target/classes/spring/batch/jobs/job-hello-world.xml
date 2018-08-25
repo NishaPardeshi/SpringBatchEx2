@@ -1,0 +1,38 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<import resource="../config/context.xml" />
+	<import resource="../config/database.xml" />
+
+	<job id="helloWorldJob" xmlns="http://www.springframework.org/schema/batch">
+	  <step id="step1" next="step2">
+		<tasklet>
+			<chunk reader="cvsFileItemReader" writer="xmlItemWriter" 
+                              processor="itemProcessor" commit-interval="10">
+			</chunk>
+		</tasklet>
+	  </step>
+	   <step id="step2" next="multiresource">
+		<tasklet>
+			<chunk reader="cvsFileItemReader" writer="xmlItemWriter1" 
+                              processor="itemProcessor" commit-interval="10">
+			</chunk>
+		</tasklet>
+	  </step>
+	 <step id="multiresource" next="deleteDir">
+		<tasklet>
+			<chunk reader="multiResourceReader" writer="flatFileItemWriter"
+				commit-interval="1" />
+		</tasklet>
+    </step>
+     <step id="deleteDir">
+			<tasklet ref="fileDeletingTasklet"></tasklet>
+	  </step>
+	</job>
+
+</beans>
